@@ -6,80 +6,103 @@ using System.Web;
 namespace Web.Infrastructure
 {
     using System.Data;
+    using System.Threading.Tasks;
     using Models;
 
     public class OrderService
     {
-        public List<Order> GetOrdersForCompany(int CompanyId)
+        public async Task<List<Order>> GetOrdersForCompanyAsync(int CompanyId)
         {
+			// Validate input
+			if (CompanyId <= 0)
+			{
+				throw new HttpRequestValidationException($"(GetOrdersForCompany) Invalid parameter {CompanyId} in GET request.");
+			}
 
-            var database = new Database();
+			var database = new Database();
 
-            // Get the orders
-            var sql1 =
-                "SELECT c.name, o.description, o.order_id FROM company c INNER JOIN [order] o on c.company_id=o.company_id";
+			// Get the company name
+			String companyName = "";
+			using (var readerCompany = database.ExecuteReader($"SELECT TOP 1 name from Company WHERE company_id={CompanyId}"))
+			{
+				if (readerCompany.Read())
+				{
+					var recordCompany = (IDataRecord)readerCompany;
+					companyName = readerCompany["name"].ToString();
+				}
+			}
 
-            var reader1 = database.ExecuteReader(sql1);
+			// Retieve all orders for the company sorted by order_id, product_id
+			var sql1 = $@"
+SELECT o.order_id, o.description, p.product_id, p.name as pname, p.price as pprice, op.price as opprice, op.quantity
+ FROM [order] o (NOLOCK)
+ INNER JOIN [orderproduct] op (NOLOCK) on op.order_id = o.order_id
+ INNER JOIN [product] p (NOLOCK) on p.product_id = op.product_id
+ WHERE o.company_id={CompanyId}
+ ORDER BY o.order_id, p.product_id
+";
 
-            var values = new List<Order>();
-            
-            while (reader1.Read())
-            {
-                var record1 = (IDataRecord) reader1;
+			var values = new List<Order>();
 
-                values.Add(new Order()
-                {
-                    CompanyName = record1.GetString(0),
-                    Description = record1.GetString(1),
-                    OrderId = record1.GetInt32(2),
-                    OrderProducts = new List<OrderProduct>()
-                });
+			// Iterate through each query result asynchronously; using statement guarantees reader will be closed
+			using (var reader1 = await database.ExecuteReaderAsync(sql1))
+			{
+				Order order = null;
+				int lastOrderId = 0;
 
-            }
+				// Read data asynchronously
+				while (await reader1.ReadAsync())
+				{
+					var record1 = (IDataRecord)reader1;
 
-            reader1.Close();
+					int orderId = Int32.Parse(record1["order_id"].ToString());
+					String description = record1["description"].ToString();
 
-            //Get the order products
-            var sql2 =
-                "SELECT op.price, op.order_id, op.product_id, op.quantity, p.name, p.price FROM orderproduct op INNER JOIN product p on op.product_id=p.product_id";
+					// If the there is a new order, create the order
+					if (orderId != lastOrderId)
+					{
+						order = new Order()
+						{
+							OrderId = orderId,
+							CompanyName = companyName,
+							Description = description,
+							OrderProducts = new List<OrderProduct>()
+						};
+						values.Add(order);
+					}
 
-            var reader2 = database.ExecuteReader(sql2);
+					// Add the product to the order
+					if (order != null) // should always be true
+					{
+						int productId = Int32.Parse(record1["product_id"].ToString());
+						decimal orderProductPrice = Decimal.Parse(record1["opprice"].ToString());
+						int quantity = Int32.Parse(record1["quantity"].ToString());
+						String productName = record1["pname"].ToString();
+						decimal productPrice = Decimal.Parse(record1["pprice"].ToString());
 
-            var values2 = new List<OrderProduct>();
+						order.OrderProducts.Add(new OrderProduct()
+						{
+							OrderId = orderId,
+							ProductId = productId,
+							Price = orderProductPrice,
+							Quantity = quantity,
+							Product = new Product()
+							{
+								Name = productName,
+								Price = productPrice
+							}
+						});
 
-            while (reader2.Read())
-            {
-                var record2 = (IDataRecord)reader2;
+						// Calculate the updated order total for the order
+						order.OrderTotal = order.OrderTotal + (orderProductPrice * quantity);
+					}
 
-                values2.Add(new OrderProduct()
-                {
-                    OrderId = record2.GetInt32(1),
-                    ProductId = record2.GetInt32(2),
-                    Price = record2.GetDecimal(0),
-                    Quantity = record2.GetInt32(3),
-                    Product = new Product()
-                    {
-                        Name = record2.GetString(4),
-                        Price = record2.GetDecimal(5)
-                    }
-                });
-             }
+					// Save the last orderId to determine if it changes for the next iteration
+					lastOrderId = orderId;
+				}
+			}
 
-            reader2.Close();
-
-            foreach (var order in values)
-            {
-                foreach (var orderproduct in values2)
-                {
-                    if (orderproduct.OrderId != order.OrderId)
-                        continue;
-
-                    order.OrderProducts.Add(orderproduct);
-                    order.OrderTotal = order.OrderTotal + (orderproduct.Price * orderproduct.Quantity);
-                }
-            }
-
-            return values;
-        }
-    }
+			return values;
+		}
+	}
 }
