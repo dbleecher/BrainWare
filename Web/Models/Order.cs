@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Web.Models
 {
     using System.Security.AccessControl;
 
+    /// <summary>
+    /// class Order - class provides top-level order information for a given order
+    ///     passed to the razor page to supply order data to render
+    /// </summary>
     public class Order
     {
         public int OrderId { get; set; }
@@ -22,6 +24,11 @@ namespace Web.Models
     }
 
 
+    /// <summary>
+    /// class OrderProduct - class provides order information for a given order/product
+    ///     combination used to supply the order quantity and price of a given product
+    ///     for a given order, passed to the razor page to render.
+    /// </summary>
     public class OrderProduct
     {
         public int OrderId { get; set; }
@@ -36,6 +43,10 @@ namespace Web.Models
 
     }
 
+    /// <summary>
+    /// class Product - class provides the current name and price 
+    ///     of a given product passed to the razor page to render.
+    /// </summary>
     public class Product
     {
         public string Name { get; set; }

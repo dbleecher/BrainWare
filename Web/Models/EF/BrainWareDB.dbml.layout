@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="BrainWareDB">
+  <DataContextMoniker Name="/BrainWareDBDataContext" />
+  <nestedChildShapes>
+    <classShape Id="0a12f64b-0d81-4f6d-8904-ae683b08ab3a" absoluteBounds="3.625, 0.5, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/BrainWareDBDataContext/Company" />
+      <nestedChildShapes>
+        <elementListCompartment Id="525d5646-980c-4a27-a660-3f72170a87e5" absoluteBounds="3.64, 0.96, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="68e3060d-7699-4926-a6e4-fce76b2351c4" absoluteBounds="3.875, 2.375, 2, 1.3862939453125">
+      <DataClassMoniker Name="/BrainWareDBDataContext/Order" />
+      <nestedChildShapes>
+        <elementListCompartment Id="6bd15612-2345-46b4-b802-95b7882ca28b" absoluteBounds="3.89, 2.835, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(4.90625 : 1.69399251302083); (4.90625 : 2.375)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BrainWareDBDataContext/Company/Company_Order" />
+      <nodes>
+        <classShapeMoniker Id="0a12f64b-0d81-4f6d-8904-ae683b08ab3a" />
+        <classShapeMoniker Id="68e3060d-7699-4926-a6e4-fce76b2351c4" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="616409f8-0232-48e7-b79b-ccaf0b4aa579" absoluteBounds="0.625, 2.625, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/BrainWareDBDataContext/orderproduct" />
+      <nestedChildShapes>
+        <elementListCompartment Id="9ac580c2-ca5c-4f7c-beeb-31e98f29759a" absoluteBounds="0.64, 3.085, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(3.875 : 3.19314697265625); (2.625 : 3.19314697265625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BrainWareDBDataContext/Order/Order_orderproduct" />
+      <nodes>
+        <classShapeMoniker Id="68e3060d-7699-4926-a6e4-fce76b2351c4" />
+        <classShapeMoniker Id="616409f8-0232-48e7-b79b-ccaf0b4aa579" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="15238b4b-2eb9-4c12-8e50-3c30fa31fbc3" absoluteBounds="0.875, 0.5, 2, 1.3862939453125">
+      <DataClassMoniker Name="/BrainWareDBDataContext/Product" />
+      <nestedChildShapes>
+        <elementListCompartment Id="63fc8f5e-8499-45de-8dbd-61df61c1cb03" absoluteBounds="0.89, 0.96, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(1.75 : 1.8862939453125); (1.75 : 2.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/BrainWareDBDataContext/Product/Product_orderproduct" />
+      <nodes>
+        <classShapeMoniker Id="15238b4b-2eb9-4c12-8e50-3c30fa31fbc3" />
+        <classShapeMoniker Id="616409f8-0232-48e7-b79b-ccaf0b4aa579" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

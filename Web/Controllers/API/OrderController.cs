@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace Web.Controllers
@@ -17,9 +14,20 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IEnumerable<Order>> GetOrders(int id = 1)
         {
-            var orderService = new OrderService();
+            try
+            {
+                var orderService = new OrderService();
 
-            return await orderService.GetOrdersForCompanyAsync(id);
+                return await orderService.GetOrdersForCompanyAsync(id);
+            }
+            catch (Exception ex)
+            {
+                // Log C# exception and rethrow exception to razor page to display error
+                string error = "EXCEPTION CAUGHT: " + ex.Message + " " + ex.InnerException ?? "";
+                error += ex.StackTrace;
+                System.Diagnostics.Trace.TraceError(error);
+                throw;
+            }
         }
     }
 }

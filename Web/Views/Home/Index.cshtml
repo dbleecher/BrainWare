@@ -37,7 +37,17 @@
 
                     $orders.append($orderList);
                 }
-            }
+			},
+			'error': function (jqXHR, textStatus, errorThrown) {
+                var r = jQuery.parseJSON(jqXHR.responseText);
+				var msg = textStatus
+					+ ' : ' + errorThrown
+					+ ' : ' + r.Message
+					+ " : " + r.ExceptionMessage
+                    // uncomment for debugging:
+					//+ '<br/><br/>Stack Trace:<br/>' + r.StackTrace;
+				$orders.html(msg);
+			}
         });
     });
 </script>
